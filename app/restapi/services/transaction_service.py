@@ -1,6 +1,7 @@
 import decimal
 
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from restapi.models import Transaction, Wallet
@@ -9,7 +10,9 @@ from restapi.models import Transaction, Wallet
 class TransactionService:
     @staticmethod
     @transaction.atomic
-    def perform_transaction(wallet: Wallet, txid: str, amount: decimal.Decimal) -> Transaction:
+    def perform_transaction(wallet_id: int, txid: str, amount: decimal.Decimal) -> Transaction:
+        wallet = get_object_or_404(Wallet, pk=wallet_id)
+
         if wallet.balance + amount < 0:
             raise serializers.ValidationError("Transaction could not be completed, insufficient funds.")
 

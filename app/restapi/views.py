@@ -1,4 +1,3 @@
-from django.http import Http404
 from django_filters.rest_framework import (
     DjangoFilterBackend,
     FilterSet,
@@ -99,11 +98,7 @@ class TransactionView(viewsets.ModelViewSet):
         wallet_id = self.kwargs['wallet_pk']
         txid = serializer.validated_data.get('txid')
         amount = serializer.validated_data.get('amount')
-        try:
-            wallet = Wallet.objects.get(pk=wallet_id)
-        except Wallet.DoesNotExist:
-            raise Http404("Wallet does not exist")
-        created = TransactionService.perform_transaction(wallet, txid, amount)
+        created = TransactionService.perform_transaction(wallet_id, txid, amount)
         serializer.instance = created
 
     def destroy(self, request, *args, **kwargs):
