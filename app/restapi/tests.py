@@ -211,7 +211,7 @@ class TransactionAPITests(APITestCase):
 
     def test_create_transaction(self) -> None:
         url = reverse("wallet-transactions", kwargs={"wallet_pk": self.wallet_2.id})
-        new_transaction_payload = dict(txid="test-txid-12345678", amount="0.00000000000009", wallet=1)
+        new_transaction_payload = dict(txid="test-txid-12345678", amount="0.00000000000009")
         response = self.client.post(url, new_transaction_payload)
         new_transaction = Transaction.objects.get(id=response.data["id"])
         wallet = Wallet.objects.get(id=response.data["wallet"])
@@ -220,6 +220,24 @@ class TransactionAPITests(APITestCase):
         self.compare_transactions(response.data, new_transaction)
 
         self.assertEqual(wallet.balance, decimal.Decimal("230.00000000000009"))
+
+    def test_create_transaction_with_zero_amount(self) -> None:
+        url = reverse("wallet-transactions", kwargs={"wallet_pk": self.wallet_2.id})
+        new_transaction_payload = dict(txid="test-txid-12345672", amount="0")
+        response = self.client.post(url, new_transaction_payload)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_transaction_with_negative_amount_more_than_wallet_balance(self) -> None:
+        url = reverse("wallet-transactions", kwargs={"wallet_pk": self.wallet_2.id})
+        new_transaction_payload = dict(txid="test-txid-22345672", amount="-235")
+        response = self.client.post(url, new_transaction_payload)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_transaction_with_duplicate_txid(self) -> None:
+        url = reverse("wallet-transactions", kwargs={"wallet_pk": self.wallet_1.id})
+        new_transaction_payload = dict(txid=self.transaction_1_w1.txid, amount="100")
+        response = self.client.post(url, new_transaction_payload)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_transaction(self) -> None:
         url = reverse(
