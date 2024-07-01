@@ -17,3 +17,8 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = ["id", "wallet", "txid", "amount"]
         read_only_fields = ["wallet"]
+
+    def validate_amount(self, value):
+        if value == 0:
+            raise serializers.ValidationError("Amount cannot be zero")
+        return value
