@@ -11,7 +11,7 @@ class TransactionService:
     @staticmethod
     @transaction.atomic
     def perform_transaction(wallet_id: int, txid: str, amount: decimal.Decimal) -> Transaction:
-        wallet = get_object_or_404(Wallet, pk=wallet_id)
+        wallet = get_object_or_404(Wallet.objects.select_for_update(), pk=wallet_id)
 
         if wallet.balance + amount < 0:
             raise serializers.ValidationError("Transaction could not be completed, insufficient funds.")
