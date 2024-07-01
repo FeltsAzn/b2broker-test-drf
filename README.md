@@ -71,7 +71,7 @@ pip install -r requirements.txt
 And run application
 
 ```bash
-make local-up
+make local-run
 ```
 
 ----
@@ -88,7 +88,6 @@ by label - get wallets, where wallet label contains specific word
 by balance_from - get wallets by amount, where wallet balance greater or equals set balance
 
 Transaction:
-by wallet_id - get all transactions for specific wallet,
 by txid - get transaction with specific txid,
 by amount_from - get transactions, where transaction amount greater or equals set amount
 ```
